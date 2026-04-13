@@ -28,6 +28,10 @@ class UserProfile:
     favorite_mood: str
     target_energy: float
     likes_acoustic: bool
+    """ 
+    target_acousticness: float  # replaces likes_acoustic bool; use 0.0–1.0 range
+    target_valence: float       # emotional brightness preference: 0.0 (dark) to 1.0 (euphoric)
+    """
 
 class Recommender:
     """

@@ -29,6 +29,14 @@ Some prompts to answer:
 
 You can include a simple diagram or bullet list if helpful.
 
+Real world recommendation system in product like YouTube and Spotify primarly uses two type of prediction
+
+- Contant-Based Filtering: Recommending songs based on similar song attributes like genre and tmepo
+- Collaborative Filtering: Recommending songs that other users similar to you has liked. "Users like you also listened to..."
+
+The current system for this ranker uses a simple algorithm with four parameter, if the song genre and mood matches the user favorite, how close the song is to the user energy level and whether the user like accoustic song
+$$\text{score} = 0.50 \cdot M + 0.30 \cdot G + 0.15 \cdot E + 0.05 \cdot A$$
+
 ---
 
 ## Getting Started
