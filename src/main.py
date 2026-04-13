@@ -10,22 +10,59 @@ You will implement the functions in recommender.py:
 """
 
 from recommender import load_songs, recommend_songs
+from tabulate import tabulate, SEPARATING_LINE
+
+
+def print_profile_table(name: str, profile: dict) -> None:
+    rows = [
+        ["Favorite Genre",     profile["favorite_genre"].title()],
+        ["Favorite Mood",      profile["favorite_mood"].title()],
+        ["Target Energy",      f"{profile['target_energy']:.2f}"],
+        ["Likes Acoustic",     "Yes" if profile["likes_acoustic"] else "No"],
+        ["Target Valence",     f"{profile['target_valence']:.2f}"],
+        ["Target Danceability",f"{profile['target_danceability']:.2f}"],
+        ["Target Tempo",       f"{profile['target_tempo']:.0f} BPM"],
+    ]
+    print(f"\n  Profile: {name}")
+    print(tabulate(rows, headers=["Attribute", "Value"], tablefmt="outline"))
+
+
+def print_recommendations_table(recommendations: list) -> None:
+    rows = []
+    for i, (song, score, _) in enumerate(recommendations, 1):
+        rows.append([
+            f"#{i}",
+            song["title"],
+            song["artist"],
+            song["genre"].title(),
+            song["mood"].title(),
+            f"{score:.2f}",
+        ])
+    print("\n  Top Recommendations")
+    print(tabulate(
+        rows,
+        headers=["Rank", "Title", "Artist", "Genre", "Mood", "Score"],
+        tablefmt="outline",
+        colalign=("center", "left", "left", "left", "left", "right"),
+    ))
+
+
+def print_breakdown_table(recommendations: list) -> None:
+    rows = []
+    for i, (_, _, explanation) in enumerate(recommendations, 1):
+        reasons = explanation.split("; ")
+        for j, reason in enumerate(reasons):
+            rank_label = f"#{i}" if j == 0 else ""
+            rows.append([rank_label, reason])
+        if i < len(recommendations):
+            rows.append(SEPARATING_LINE)
+    print("\n  Scoring Breakdown")
+    print(tabulate(rows, headers=["Rank", "Factor & Points"], tablefmt="outline"))
 
 
 def main() -> None:
     songs = load_songs("data/songs.csv")
-    print(f"Loaded {len(songs)} songs from the dataset.")
-
-    # Starter example profile
-    user_prefs = {
-        "favorite_genre": "pop",
-        "favorite_mood": "happy",
-        "target_energy": 0.8,
-        "likes_acoustic": False,
-        "target_valence": 0.8,
-        "target_danceability": 0.7,
-        "target_tempo": 120.0,
-    }
+    print(f"\nLoaded {len(songs)} songs from the dataset.")
 
     # Profile 1 — The Sad Banger
     sad_banger = {
@@ -60,23 +97,17 @@ def main() -> None:
         "target_tempo": 128.0,
     }
 
+    profile_names = ["The Sad Banger", "The Classical Happy Fan", "The Acoustic Raver"]
     adversarial_profiles = [sad_banger, classical_happy, acoustic_raver]
 
-    for profile in adversarial_profiles:
+    for name, profile in zip(profile_names, adversarial_profiles):
         recommendations = recommend_songs(profile, songs, k=5)
+        print("\n" + "=" * 62)
+        print_profile_table(name, profile)
+        print_recommendations_table(recommendations)
+        print_breakdown_table(recommendations)
 
-        print("\nTop Recommendations")
-        print("=" * 52)
-        for i, rec in enumerate(recommendations, 1):
-            song, score, explanation = rec
-            reasons = explanation.split("; ")
-
-            print(f"\n#{i}  {song['title']}  —  {song['artist']}")
-            print(f"    Score: {score:.2f}")
-            print(f"    Why this song:")
-            for reason in reasons:
-                print(f"      • {reason}")
-        print("\n" + "=" * 52)
+    print("\n" + "=" * 62 + "\n")
 
 
 if __name__ == "__main__":

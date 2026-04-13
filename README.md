@@ -13,6 +13,8 @@ Your goal is to:
 
 This version builds a rule-based music recommender that scores each song in a catalog against a user's taste profile across four attributes — genre, mood, energy level, and acoustic preference — then returns the top-ranked matches. The scoring weights mood most heavily, followed by genre, energy proximity, and acousticness. To stress-test the system, three adversarial user profiles were designed to expose cases where conflicting signals produce counterintuitive results, revealing how small weight differences can silently override a user's most explicit preferences.
 
+![](./img/tabulate.png)
+
 ---
 
 ## How The System Works
