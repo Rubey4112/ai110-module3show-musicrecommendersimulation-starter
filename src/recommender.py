@@ -28,10 +28,9 @@ class UserProfile:
     favorite_mood: str
     target_energy: float
     likes_acoustic: bool
-    """ 
-    target_acousticness: float  # replaces likes_acoustic bool; use 0.0–1.0 range
-    target_valence: float       # emotional brightness preference: 0.0 (dark) to 1.0 (euphoric)
-    """
+    target_valence: float = 0.5      # emotional brightness: 0.0 (dark) to 1.0 (euphoric)
+    target_danceability: float = 0.5 # how dance-friendly: 0.0 (non-danceable) to 1.0
+    target_tempo: float = 120.0      # preferred tempo in BPM
 
 class Recommender:
     """
@@ -99,21 +98,38 @@ def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
 
     if song.get("genre") == user_prefs.get("favorite_genre"):
         score += 2.0
-        reasons.append(f"genre matches '{user_prefs['favorite_genre']}' (+2.0 pts)")
+        reasons.append(f"genre matches '{user_prefs['favorite_genre']}' (+1.0 pts)")
 
-    # Energy proximity (0.0–1.0 → weighted ×2.0)
+    # Energy proximity (0.0–1.0 → weighted ×4.0)
     target_energy = user_prefs.get("target_energy", 0.5)
     energy_points = 2.0 * (1 - abs(song["energy"] - target_energy))
     score += energy_points
-    if abs(song["energy"] - target_energy) <= 0.15:
-        reasons.append(f"energy level is close to your target ({song['energy']:.2f}) (+{energy_points:.2f} pts)")
+    reasons.append(f"energy level ({song['energy']:.2f} vs target {target_energy:.2f}) (+{energy_points:.2f} pts)")
 
     # Acousticness proximity (0.0–1.0 → weighted ×1.5)
     acousticness_target = 0.8 if user_prefs.get("likes_acoustic", False) else 0.2
     acousticness_points = 1.5 * (1 - abs(song["acousticness"] - acousticness_target))
     score += acousticness_points
-    if abs(song["acousticness"] - acousticness_target) <= 0.2:
-        reasons.append(f"acousticness fits your preference (+{acousticness_points:.2f} pts)")
+    reasons.append(f"acousticness ({song['acousticness']:.2f} vs target {acousticness_target:.2f}) (+{acousticness_points:.2f} pts)")
+
+    # Valence proximity (0.0–1.0 → weighted ×1.5)
+    target_valence = user_prefs.get("target_valence", 0.5)
+    valence_points = 1.5 * (1 - abs(song["valence"] - target_valence))
+    score += valence_points
+    reasons.append(f"valence ({song['valence']:.2f} vs target {target_valence:.2f}) (+{valence_points:.2f} pts)")
+
+    # Danceability proximity (0.0–1.0 → weighted ×1.5)
+    target_danceability = user_prefs.get("target_danceability", 0.5)
+    danceability_points = 1.5 * (1 - abs(song["danceability"] - target_danceability))
+    score += danceability_points
+    reasons.append(f"danceability ({song['danceability']:.2f} vs target {target_danceability:.2f}) (+{danceability_points:.2f} pts)")
+
+    # Tempo proximity (BPM, normalized over ±120 BPM range → weighted ×1.5)
+    target_tempo = user_prefs.get("target_tempo", 120.0)
+    tempo_diff_norm = min(abs(song["tempo_bpm"] - target_tempo) / 120.0, 1.0)
+    tempo_points = 1.5 * (1 - tempo_diff_norm)
+    score += tempo_points
+    reasons.append(f"tempo ({song['tempo_bpm']:.0f} BPM vs target {target_tempo:.0f} BPM) (+{tempo_points:.2f} pts)")
 
     return score, reasons
 

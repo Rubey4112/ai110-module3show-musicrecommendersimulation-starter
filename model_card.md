@@ -2,8 +2,7 @@
 
 ## 1. Model Name  
 
-Give your model a short, descriptive name.  
-Example: **VibeFinder 1.0**  
+SpottyFind 
 
 ---
 
@@ -70,6 +69,8 @@ Prompts:
 - Cases where the system overfits to one preference  
 - Ways the scoring might unintentionally favor some users  
 
+The current scoring system has several structural biases that limit recommendation quality. Energy is the dominant feature at 4x weight, meaning it routinely overrides genre and mood preferences, a jazz fan with high target energy will likely receive EDM before jazz. The acousticness preference is collapsed into a binary boolean (acoustic vs. not), erasing any nuance for users who fall in between, while three song attributes, valence, danceability, and tempo, are stored but never used in scoring at all. The song catalog also skews heavily toward high-energy tracks, meaning low-energy listeners face a structurally smaller pool of close matches and receive worse recommendations by design. Finally, mood matching is all-or-nothing with no concept of adjacent or similar moods, reinforcing a filter bubble where users are never exposed to music outside their exact labeled preference.
+
 ---
 
 ## 7. Evaluation  
@@ -84,6 +85,9 @@ Prompts:
 - Any simple tests or comparisons you ran  
 
 No need for numeric metrics unless you created some.
+
+I tried the three "adversarial" profiles described in the README. Even as I messed around with the scoring algorithm and making significant changes, the top songs recommended for each profile often doesn't change. Even though I disagree with some of my algorithm's recommendations. It seem that a grouping of specific parameters depending on the condiiton can just totally outweigh the other parameters. It seems that for eahc different user, the weight of each parameters (genre, energy, accousticness, etc) will have different relative weight to the other will also be different to improve the algorithm. There is no "one size fit all" set of weights.
+
 
 ---
 

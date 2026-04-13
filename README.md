@@ -47,6 +47,12 @@ $$\text{score} = 0.50 \cdot M + 0.30 \cdot G + 0.15 \cdot E + 0.05 \cdot A$$
 
 ---
 
+| Profile | Signals in conflict | Expected result | Actual result | Weakness exposed |
+|---|---|---|---|---|
+| Sad Banger | `favorite_mood: "sad"` vs `favorite_genre: "pop"` + `target_energy: 0.95` | Sad, slow song (Mississippi Low) | Energetic pop (Gym Hero) | Mood (+3.0) can be beaten by genre (+2.0) + strong energy proximity (~+2.0) combined |
+| Classical Happy Fan | `favorite_genre: "classical"` vs `favorite_mood: "happy"` | Classical song (Autumn Sonata) | Pop/indie (Rooftop Lights) | When genre and mood never co-occur in the catalog, the higher-weighted attribute (mood +3.0 > genre +2.0) silently wins every time |
+| Acoustic Raver | `favorite_genre: "edm"` + `target_energy: 0.9` vs `favorite_mood: "chill"` + `likes_acoustic: True` | High-energy EDM (Neon Apex) | Lofi/chill (Midnight Coding) | `likes_acoustic` and `favorite_mood` compound — both independently favor the same low-energy acoustic songs, overriding the numeric energy signal |
+
 ## Getting Started
 
 ### Setup
@@ -89,6 +95,16 @@ Use this section to document the experiments you ran. For example:
 - What happened when you changed the weight on genre from 2.0 to 0.5
 - What happened when you added tempo or valence to the score
 - How did your system behave for different types of users
+
+I tried to double the weight on the energy level to see what would happen but it didn't do anything to the top recommendation. Additionally, I tried adding tempo and valence to the scoring algorithm but it seem that the basic parameters that I first implemented outweigh the effects of tempo and valence. 
+
+A summary of the what I tried (prior to add tempo, valence and dancibility to the score):
+
+| Profile | Signals in conflict | Expected result | Actual result | Weakness exposed |
+|---|---|---|---|---|
+| Sad Banger | `favorite_mood: "sad"` vs `favorite_genre: "pop"` + `target_energy: 0.95` | Sad, slow song (Mississippi Low) | Energetic pop (Gym Hero) | Mood (+3.0) can be beaten by genre (+2.0) + strong energy proximity (~+2.0) combined |
+| Classical Happy Fan | `favorite_genre: "classical"` vs `favorite_mood: "happy"` | Classical song (Autumn Sonata) | Pop/indie (Rooftop Lights) | When genre and mood never co-occur in the catalog, the higher-weighted attribute (mood +3.0 > genre +2.0) silently wins every time |
+| Acoustic Raver | `favorite_genre: "edm"` + `target_energy: 0.9` vs `favorite_mood: "chill"` + `likes_acoustic: True` | High-energy EDM (Neon Apex) | Lofi/chill (Midnight Coding) | `likes_acoustic` and `favorite_mood` compound — both independently favor the same low-energy acoustic songs, overriding the numeric energy signal |
 
 ---
 
