@@ -17,19 +17,27 @@ Replace this paragraph with your own summary of what your version does.
 
 ## How The System Works
 
-Explain your design in plain language.
+Each song in the catalog is described by ten attributes: a unique ID, title, artist, genre, mood, energy level, tempo, valence, danceability, and acousticness. The system only uses four of those attributes when scoring — genre, mood, energy, and acousticness. The rest are stored but not yet factored in.
 
-Some prompts to answer:
+A user is represented by a taste profile that captures four preferences: their favorite genre, their favorite mood, a target energy level (on a 0.0–1.0 scale), and whether or not they enjoy acoustic music.
 
-- What features does each `Song` use in your system
-  - For example: genre, mood, energy, tempo
-- What information does your `UserProfile` store
-- How does your `Recommender` compute a score for each song
-- How do you choose which songs to recommend
+When a recommendation is requested, every song in the catalog is scored against that profile. The score is built up from four independent contributions:
 
-You can include a simple diagram or bullet list if helpful.
+- **Mood match** — if the song's mood matches the user's favorite, add 3 points
+- **Genre match** — if the song's genre matches the user's favorite, add 2 points
+- **Energy proximity** — add up to 2 points depending on how close the song's energy is to the user's target (songs further away earn fewer points)
+- **Acousticness fit** — add up to 1.5 points depending on how well the song's acoustic quality matches whether the user likes acoustic music
 
-Real world recommendation system in product like YouTube and Spotify primarly uses two type of prediction
+The songs are then sorted from highest to lowest score and the top-k are returned as recommendations.
+
+**Potential biases to be aware of:**
+
+- Mood carries the most weight (3 pts), so a perfect mood match can push a song to the top even if genre, energy, and acousticness are all poor fits.
+- Genre and mood are exact-match only — a "pop" fan scores 0 for "indie pop", even if those songs would be a great fit in practice.
+- Tempo, valence, and danceability are collected but ignored entirely by the scorer, so two very different-sounding songs can receive identical scores.
+- The acoustic preference is treated as a simple yes/no, which maps to fixed targets of 0.8 or 0.2. A user who only mildly likes acoustic music is treated the same as one who exclusively listens to it.
+
+Real world recommendation systems in products like YouTube and Spotify primarily use two types of prediction:
 
 - Contant-Based Filtering: Recommending songs based on similar song attributes like genre and tmepo
 - Collaborative Filtering: Recommending songs that other users similar to you has liked. "Users like you also listened to..."

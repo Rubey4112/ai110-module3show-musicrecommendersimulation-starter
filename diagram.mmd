@@ -1,0 +1,22 @@
+flowchart TD
+    A[CSV File] --> B[load_songs\ncsv_path]
+    B --> C[Song dict\nid, title, artist, genre\nmood, energy, tempo_bpm\nvalence, danceability, acousticness]
+    C --> D[score_song\nuser_prefs, song]
+
+    D --> E{Genre match?}
+    E -- yes --> F[+2.0 pts]
+    E -- no --> G[+0 pts]
+
+    D --> H{Mood match?}
+    H -- yes --> I[+3.0 pts]
+    H -- no --> J[+0 pts]
+
+    D --> K[Energy proximity\n2.0 × 1 - abs diff]
+    D --> L[Acousticness proximity\n1.5 × 1 - abs diff]
+
+    F & G & I & J & K & L --> M[Total Score + Reasons list]
+
+    M --> N[recommend_songs\ncollects all scored songs]
+    N --> O[Sort by score descending]
+    O --> P[Slice top-k]
+    P --> Q[Ranked List\nof song, score, explanation tuples]
