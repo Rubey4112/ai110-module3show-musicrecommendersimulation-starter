@@ -13,8 +13,11 @@ flowchart TD
 
     D --> K[Energy proximity\n2.0 × 1 - abs diff]
     D --> L[Acousticness proximity\n1.5 × 1 - abs diff]
+    D --> R[Valence proximity\n1.5 × 1 - abs diff]
+    D --> S[Danceability proximity\n1.5 × 1 - abs diff]
+    D --> T[Tempo proximity\n1.5 × 1 - clamp abs diff / 120]
 
-    F & G & I & J & K & L --> M[Total Score + Reasons list]
+    F & G & I & J & K & L & R & S & T --> M[Total Score + Reasons list]
 
     M --> N[recommend_songs\ncollects all scored songs]
     N --> O[Sort by score descending]

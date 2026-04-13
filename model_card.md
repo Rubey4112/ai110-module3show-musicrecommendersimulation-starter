@@ -1,4 +1,4 @@
-# 🎧 Model Card: Music Recommender Simulation
+# Model Card: Music Recommender Simulation
 
 ## 1. Model Name  
 
@@ -8,108 +8,79 @@ SpottyFind
 
 ## 2. Intended Use  
 
-Describe what your recommender is designed to do and who it is for. 
-
-Prompts:  
-
-- What kind of recommendations does it generate  
-- What assumptions does it make about the user  
-- Is this for real users or classroom exploration  
+SpottyFind recommends songs that match a user's music preferences.  
+It is designed for classroom exploration of how recommendation algorithms work.  
+It assumes the user can describe their taste using genre, mood, energy level, and similar attributes.  
+It is not intended for real music streaming services or production use.
 
 ---
 
 ## 3. How the Model Works  
 
-Explain your scoring approach in simple language.  
-
-Prompts:  
-
-- What features of each song are used (genre, energy, mood, etc.)  
-- What user preferences are considered  
-- How does the model turn those into a score  
-- What changes did you make from the starter logic  
-
-Avoid code here. Pretend you are explaining the idea to a friend who does not program.
+Every song in the catalog gets a score based on how well it matches the user's preferences.  
+If a song's genre matches the user's favorite genre, it earns 2 bonus points.  
+If a song's mood matches the user's favorite mood, it earns 3 bonus points.  
+For numeric features — energy, acousticness, valence, danceability, and tempo — the closer the song's value is to the user's target, the more points it earns.  
+All the points are added together. The five highest-scoring songs are returned as recommendations.
 
 ---
 
 ## 4. Data  
 
-Describe the dataset the model uses.  
-
-Prompts:  
-
-- How many songs are in the catalog  
-- What genres or moods are represented  
-- Did you add or remove data  
-- Are there parts of musical taste missing in the dataset  
+The catalog contains 17 songs.  
+Songs span 13 genres: pop, lofi, rock, ambient, jazz, synthwave, indie pop, hip-hop, r&b, country, metal, edm, folk, blues, and classical.  
+Each song has 7 attributes: genre, mood, energy, tempo (BPM), valence, danceability, and acousticness.  
+The dataset is very small. Most genres are represented by only one song.  
+The catalog skews toward high-energy tracks, so low-energy listeners have fewer close matches.  
+Moods like "focused," "nostalgic," and "peaceful" each appear only once.
 
 ---
 
 ## 5. Strengths  
 
-Where does your system seem to work well  
-
-Prompts:  
-
-- User types for which it gives reasonable results  
-- Any patterns you think your scoring captures correctly  
-- Cases where the recommendations matched your intuition  
+The system works reasonably well for users who prefer high-energy music, since most songs lean energetic.  
+Genre and mood bonuses make the scoring easy to understand and explain.  
+Every score is fully transparent — each point can be traced back to a specific preference match.  
+Users with common preferences (pop, happy, high energy) tend to get intuitive results.
 
 ---
 
 ## 6. Limitations and Bias 
 
-Where the system struggles or behaves unfairly. 
-
-Prompts:  
-
-- Features it does not consider  
-- Genres or moods that are underrepresented  
-- Cases where the system overfits to one preference  
-- Ways the scoring might unintentionally favor some users  
-
-The current scoring system has several structural biases that limit recommendation quality. Energy is the dominant feature at 4x weight, meaning it routinely overrides genre and mood preferences, a jazz fan with high target energy will likely receive EDM before jazz. The acousticness preference is collapsed into a binary boolean (acoustic vs. not), erasing any nuance for users who fall in between, while three song attributes, valence, danceability, and tempo, are stored but never used in scoring at all. The song catalog also skews heavily toward high-energy tracks, meaning low-energy listeners face a structurally smaller pool of close matches and receive worse recommendations by design. Finally, mood matching is all-or-nothing with no concept of adjacent or similar moods, reinforcing a filter bubble where users are never exposed to music outside their exact labeled preference.
+Energy is the most influential feature. A jazz fan who prefers high energy will likely receive EDM before jazz.  
+Acousticness is treated as a yes/no preference, which erases nuance for users who fall somewhere in between.  
+Mood matching is all-or-nothing. There is no credit for similar moods like "chill" and "relaxed."  
+The small catalog means some genres and moods have no close matches at all.  
+Low-energy listeners are structurally disadvantaged because the catalog has fewer low-energy songs.  
+Rare moods like "nostalgic" or "peaceful" are nearly impossible to satisfy with only one matching song.
 
 ---
 
 ## 7. Evaluation  
 
-How you checked whether the recommender behaved as expected. 
-
-Prompts:  
-
-- Which user profiles you tested  
-- What you looked for in the recommendations  
-- What surprised you  
-- Any simple tests or comparisons you ran  
-
-No need for numeric metrics unless you created some.
-
-I tried the three "adversarial" profiles described in the README. Even as I messed around with the scoring algorithm and making significant changes, the top songs recommended for each profile often doesn't change. Even though I disagree with some of my algorithm's recommendations. It seem that a grouping of specific parameters depending on the condiiton can just totally outweigh the other parameters. It seems that for eahc different user, the weight of each parameters (genre, energy, accousticness, etc) will have different relative weight to the other will also be different to improve the algorithm. There is no "one size fit all" set of weights.
-
+Three adversarial user profiles were tested: the Sad Banger, the Classical Happy Fan, and the Acoustic Raver.  
+Each profile was designed to create a conflict between preferences (e.g., high energy but acoustic).  
+The top recommendations rarely changed even after making significant changes to the scoring weights.  
+This showed that certain feature combinations dominate the score regardless of how the weights shift.  
+It also showed that no single set of weights works well for every type of user.
 
 ---
 
 ## 8. Future Work  
 
-Ideas for how you would improve the model next.  
-
-Prompts:  
-
-- Additional features or preferences  
-- Better ways to explain recommendations  
-- Improving diversity among the top results  
-- Handling more complex user tastes  
+Add per-user weight tuning so that energy does not always dominate over genre or mood.  
+Use soft mood similarity so that adjacent moods (e.g., "chill" and "relaxed") can earn partial credit.  
+Expand the catalog to include more songs per genre and mood so rare preferences can actually be satisfied.
+Add some penalties for recommending too many similar songs.
 
 ---
 
 ## 9. Personal Reflection  
 
-A few sentences about your experience.  
+This allow me to put into perspective how hard music recommendations algorithm is to write. I like to bash on Spotify and YouTube Music for having iffy music recommender. But compared to mine, they're magnitude ahead through better algorithm and a significantly bigger catalog. Adjancently, I find the YouTube videos recommendation system to be really good, which shows how much works (and user datas) that Google has put into the YouTube algorithm.
 
-Prompts:  
+Certainly, if a user were to have music preferences that matches most of the music in the dataset, this simple algorithm can still recommend song very well. It is like finding a linear line of best fit but in more then two dimensions.
 
-- What you learned about recommender systems  
-- Something unexpected or interesting you discovered  
-- How this changed the way you think about music recommendation apps  
+I was able to use AI to explain to me at a basic level how a music recommendation system works. It also made connection with each topic and how it correlate to the functions provided in the base project. This allowed me to get a quick understanding of the materials and start designing the logic and coding. I found that for simple project like these, I can pretty easily check the AI work by looking at the logic flow. I don't think I can verify an AI works in a large project though.
+
+A list of future improvement is listed above in section 8.

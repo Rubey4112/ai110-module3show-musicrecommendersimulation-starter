@@ -45,13 +45,14 @@ Real world recommendation systems in products like YouTube and Spotify primarily
 The current system for this ranker uses a simple algorithm with four parameter, if the song genre and mood matches the user favorite, how close the song is to the user energy level and whether the user like accoustic song
 $$\text{score} = 0.50 \cdot M + 0.30 \cdot G + 0.15 \cdot E + 0.05 \cdot A$$
 
----
 
 | Profile | Signals in conflict | Expected result | Actual result | Weakness exposed |
 |---|---|---|---|---|
 | Sad Banger | `favorite_mood: "sad"` vs `favorite_genre: "pop"` + `target_energy: 0.95` | Sad, slow song (Mississippi Low) | Energetic pop (Gym Hero) | Mood (+3.0) can be beaten by genre (+2.0) + strong energy proximity (~+2.0) combined |
 | Classical Happy Fan | `favorite_genre: "classical"` vs `favorite_mood: "happy"` | Classical song (Autumn Sonata) | Pop/indie (Rooftop Lights) | When genre and mood never co-occur in the catalog, the higher-weighted attribute (mood +3.0 > genre +2.0) silently wins every time |
 | Acoustic Raver | `favorite_genre: "edm"` + `target_energy: 0.9` vs `favorite_mood: "chill"` + `likes_acoustic: True` | High-energy EDM (Neon Apex) | Lofi/chill (Midnight Coding) | `likes_acoustic` and `favorite_mood` compound — both independently favor the same low-energy acoustic songs, overriding the numeric energy signal |
+
+---
 
 ## Getting Started
 
